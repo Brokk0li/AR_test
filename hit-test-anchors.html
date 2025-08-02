@@ -75,13 +75,23 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       arObject.visible = false;
       scene.addNode(arObject);
 
-      let flower = new Gltf2Node({
-        url: "media/gltf/sunflower/sunflower.gltf",
-      });
-      arObject.addNode(flower);
+      const model = null;
+      const gltfBlob = localStorage.getItem("gltfModel");
+      if (gltfBlob) {
+        console.log("loading stored model");
+        const blob = new Blob([gltfBlob], { type: "model/gltf+json" });
+        const url = URL.createObjectURL(blob);
+        model = new Gltf2Node({
+          url: url,
+        });
+      } else {
+        console.log("no gltf model loaded");
+        model = new Gltf2Node({
+          url: "media/gltf/sunflower/sunflower.gltf",
+        });
+      }
 
-      let poster = new Gltf2Node({ url: "media/gltf/poster/poster.gltf" });
-      arObject.addNode(poster);
+      arObject.addNode(model);
 
       let reticle = new Gltf2Node({ url: "media/gltf/reticle/reticle.gltf" });
       reticle.visible = false;
@@ -178,34 +188,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       const MAX_ANCHORED_OBJECTS = 30;
       let anchoredObjects = [];
       function addAnchoredObjectsToScene(anchor) {
-        let flower = new Gltf2Node({
-          url: "media/gltf/sunflower/sunflower.gltf",
+        scene.addNode(model);
+        anchoredObjects.push({
+          anchoredObject: model,
+          anchor: anchor,
         });
-
-        const gltfBlob = localStorage.getItem("gltfModel");
-        console.log(gltfBlob);
-        if (gltfBlob) {
-          console.log("loading stored model");
-          const blob = new Blob([gltfBlob], { type: "model/gltf+json" });
-          const url = URL.createObjectURL(blob);
-
-          let poster = new Gltf2Node({
-            url: url,
-          });
-
-          scene.addNode(poster);
-          anchoredObjects.push({
-            anchoredObject: poster,
-            anchor: anchor,
-          });
-        } else {
-          console.log("no gltf model loaded");
-          scene.addNode(flower);
-          anchoredObjects.push({
-            anchoredObject: flower,
-            anchor: anchor,
-          });
-        }
 
         // For performance reasons if we add too many objects start
         // removing the oldest ones to keep the scene complexity
