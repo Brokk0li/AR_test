@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <!--
 Copyright 2021 The Immersive Web Community Group
 
@@ -21,13 +21,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 -->
 <html>
   <head>
-    <meta charset='utf-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1, user-scalable=no'>
-    <meta name='mobile-web-app-capable' content='yes'>
-    <meta name='apple-mobile-web-app-capable' content='yes'>
-    <link rel='icon' type='image/png' sizes='32x32' href='favicon-32x32.png'>
-    <link rel='icon' type='image/png' sizes='96x96' href='favicon-96x96.png'>
-    <link rel='stylesheet' href='css/common.css'>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png" />
+    <link rel="stylesheet" href="css/common.css" />
 
     <title>Hit Test with Anchors</title>
   </head>
@@ -36,22 +39,25 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       <details open>
         <summary>Hit Test with Anchors</summary>
         <p>
-          current commit: poster 3
-          This sample demonstrates using hit testing to find intersections on real-world surfaces and then using Anchors to attach a virtual object to that location.
+          current commit: poster 3 This sample demonstrates using hit testing to
+          find intersections on real-world surfaces and then using Anchors to
+          attach a virtual object to that location.
           <a class="back" href="./">Back</a>
         </p>
       </details>
     </header>
     <script type="module">
-      import {WebXRButton} from './js/util/webxr-button.js';
-      import {Scene} from './js/render/scenes/scene.js';
-      import {Renderer, createWebGLContext} from './js/render/core/renderer.js';
-      import {Node} from './js/render/core/node.js';
-      import {Gltf2Node} from './js/render/nodes/gltf2.js';
-      import {DropShadowNode} from './js/render/nodes/drop-shadow.js';
-      import {vec3} from './js/render/math/gl-matrix.js';
-      import {Ray} from './js/render/math/ray.js';
-      import {img_as_gltf} from './gltf_exporter/main.js'
+      import { WebXRButton } from "./js/util/webxr-button.js";
+      import { Scene } from "./js/render/scenes/scene.js";
+      import {
+        Renderer,
+        createWebGLContext,
+      } from "./js/render/core/renderer.js";
+      import { Node } from "./js/render/core/node.js";
+      import { Gltf2Node } from "./js/render/nodes/gltf2.js";
+      import { DropShadowNode } from "./js/render/nodes/drop-shadow.js";
+      import { vec3 } from "./js/render/math/gl-matrix.js";
+      import { Ray } from "./js/render/math/ray.js";
 
       // XR globals.
       let xrButton = null;
@@ -69,13 +75,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       arObject.visible = false;
       scene.addNode(arObject);
 
-      let flower = new Gltf2Node({url: 'media/gltf/sunflower/sunflower.gltf'});
+      let flower = new Gltf2Node({
+        url: "media/gltf/sunflower/sunflower.gltf",
+      });
       arObject.addNode(flower);
 
-      let poster = new Gltf2Node({url: 'media/gltf/poster/poster.gltf'});
+      let poster = new Gltf2Node({ url: "media/gltf/poster/poster.gltf" });
       arObject.addNode(poster);
 
-      let reticle = new Gltf2Node({url: 'media/gltf/reticle/reticle.gltf'});
+      let reticle = new Gltf2Node({ url: "media/gltf/reticle/reticle.gltf" });
       reticle.visible = false;
       scene.addNode(reticle);
       let reticleHitTestResult = null;
@@ -100,31 +108,33 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           textXRNotFoundTitle: "AR NOT FOUND",
           textExitXRTitle: "EXIT  AR",
         });
-        document.querySelector('header').appendChild(xrButton.domElement);
+        document.querySelector("header").appendChild(xrButton.domElement);
 
         if (navigator.xr) {
-          navigator.xr.isSessionSupported('immersive-ar')
-                      .then((supported) => {
+          navigator.xr.isSessionSupported("immersive-ar").then((supported) => {
             xrButton.enabled = supported;
           });
         }
       }
 
       function onRequestSession() {
-        return navigator.xr.requestSession('immersive-ar', {requiredFeatures: ['local', 'hit-test', 'anchors']})
-                           .then((session) => {
-          xrButton.setSession(session);
-          onSessionStarted(session);
-        });
+        return navigator.xr
+          .requestSession("immersive-ar", {
+            requiredFeatures: ["local", "hit-test", "anchors"],
+          })
+          .then((session) => {
+            xrButton.setSession(session);
+            onSessionStarted(session);
+          });
       }
 
       function onSessionStarted(session) {
-        session.addEventListener('end', onSessionEnded);
-        session.addEventListener('select', onSelect);
+        session.addEventListener("end", onSessionEnded);
+        session.addEventListener("select", onSelect);
 
         if (!gl) {
           gl = createWebGLContext({
-            xrCompatible: true
+            xrCompatible: true,
           });
 
           renderer = new Renderer(gl);
@@ -138,14 +148,16 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         // position and render a reticle where it intersects with a real world
         // surface. To do this we first get the viewer space, then create a
         // hitTestSource that tracks it.
-        session.requestReferenceSpace('viewer').then((refSpace) => {
+        session.requestReferenceSpace("viewer").then((refSpace) => {
           xrViewerSpace = refSpace;
-          session.requestHitTestSource({ space: xrViewerSpace }).then((hitTestSource) => {
-            xrHitTestSource = hitTestSource;
-          });
+          session
+            .requestHitTestSource({ space: xrViewerSpace })
+            .then((hitTestSource) => {
+              xrHitTestSource = hitTestSource;
+            });
         });
 
-        session.requestReferenceSpace('local').then((refSpace) => {
+        session.requestReferenceSpace("local").then((refSpace) => {
           xrRefSpace = refSpace;
 
           session.requestAnimationFrame(onXRFrame);
@@ -166,13 +178,34 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       const MAX_ANCHORED_OBJECTS = 30;
       let anchoredObjects = [];
       function addAnchoredObjectsToScene(anchor) {
-        let flower = new Gltf2Node({url: 'media/gltf/sunflower/sunflower.gltf'});
-        let poster = new Gltf2Node({url: 'media/gltf/poster/poster.gltf'});
-        scene.addNode(poster);
-        anchoredObjects.push({
-          anchoredObject: poster,
-          anchor: anchor
+        let flower = new Gltf2Node({
+          url: "media/gltf/sunflower/sunflower.gltf",
         });
+
+        const gltfBlob = localStorage.getItem("gltfModel");
+        console.log(gltfBlob);
+        if (gltfBlob) {
+          console.log("loading stored model");
+          const blob = new Blob([gltfBlob], { type: "model/gltf+json" });
+          const url = URL.createObjectURL(blob);
+
+          let poster = new Gltf2Node({
+            url: url,
+          });
+
+          scene.addNode(poster);
+          anchoredObjects.push({
+            anchoredObject: poster,
+            anchor: anchor,
+          });
+        } else {
+          console.log("no gltf model loaded");
+          scene.addNode(flower);
+          anchoredObjects.push({
+            anchoredObject: flower,
+            anchor: anchor,
+          });
+        }
 
         // For performance reasons if we add too many objects start
         // removing the oldest ones to keep the scene complexity
@@ -183,17 +216,21 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           objectToRemove.anchor.delete();
         }
       }
-
+      console.log("dadadada");
+      addAnchoredObjectsToScene(null);
       let rayOrigin = vec3.create();
       let rayDirection = vec3.create();
       function onSelect(event) {
         if (reticle.visible) {
           // Create an anchor.
-          reticleHitTestResult.createAnchor().then((anchor) => {
-            addAnchoredObjectsToScene(anchor);
-          }, (error) => {
-            console.error("Could not create anchor: " + error);
-          });
+          reticleHitTestResult.createAnchor().then(
+            (anchor) => {
+              addAnchoredObjectsToScene(anchor);
+            },
+            (error) => {
+              console.error("Could not create anchor: " + error);
+            }
+          );
         }
       }
 
@@ -216,7 +253,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
           }
         }
 
-        for (const {anchoredObject, anchor} of anchoredObjects) {
+        for (const { anchoredObject, anchor } of anchoredObjects) {
           // only update the object's position if it's still in the list
           // of frame.trackedAnchors
           if (!frame.trackedAnchors.has(anchor)) {

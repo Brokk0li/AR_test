@@ -1,18 +1,19 @@
 // main.js
-import * as THREE from 'three';
-import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
-
-export let image_as_gltf = null;
+import * as THREE from "./node_modules/three/build/three.module.js";
+import { GLTFExporter } from "./node_modules/three/examples/jsm/exporters/GLTFExporter.js";
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 camera.position.z = 2;
 
-document.getElementById('upload').addEventListener('change', (event) => {
+const status = document.getElementById("status");
+status.textContent = "waiting for image";
+
+document.getElementById("upload").addEventListener("change", (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    const status = document.getElementById('status');
+    const status = document.getElementById("status");
     status.textContent = "Loading image...";
 
     const reader = new FileReader();
@@ -32,13 +33,14 @@ document.getElementById('upload').addEventListener('change', (event) => {
             const material = new THREE.MeshBasicMaterial({
                 map: texture,
                 side: THREE.DoubleSide,
-                transparent: true
+                transparent: true,
             });
 
             const plane = new THREE.Mesh(geometry, material);
-            plane.rotation.x = -Math.PI / 2;  // lay flat
-            plane.rotation.z = Math.PI;       // flip front face upward
-            plane.position.y = 0;
+            //plane.rotation.x = -Math.PI / 2; // lay flat
+            //plane.rotation.z = Math.PI; // flip front face upward
+            //plane.rotation.y = Math.PI; // flip front face upward
+            //plane.position.y = 0;
             scene.clear();
             scene.add(plane);
 
@@ -51,19 +53,23 @@ document.getElementById('upload').addEventListener('change', (event) => {
                     let output, mime, extension;
                     if (exportAsGLB) {
                         output = result;
-                        mime = 'application/octet-stream';
-                        extension = 'glb';
+                        mime = "application/octet-stream";
+                        extension = "glb";
                     } else {
                         output = JSON.stringify(result, null, 2);
-                        mime = 'application/json';
-                        extension = 'gltf';
+                        mime = "application/json";
+                        extension = "gltf";
                     }
-                    image_as_gltf = output;
+                    const reader = new FileReader();
+                    reader.onload = function (output) {
+                        localStorage.setItem("gltfModel", output.target.result);
+                    };
                     const blob = new Blob([output], { type: mime });
+                    reader.readAsText(blob); // since it's JSON
                     const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
+                    const a = document.createElement("a");
                     a.href = url;
-                    a.download = 'image-plane.' + extension;
+                    a.download = "image-plane." + extension;
                     a.click();
                     URL.revokeObjectURL(url);
 
