@@ -80,9 +80,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       if (gltfBlob) {
         console.log("loading stored model");
         const blob = new Blob([gltfBlob], { type: "model/gltf+json" });
-        const url = URL.createObjectURL(blob);
+        console.log(gltfBlob);
         model = new Gltf2Node({
-          url: "media/gltf/sunflower/sunflower.gltf",
+          json: gltfBlob,
         });
       } else {
         console.log("no gltf model loaded");
