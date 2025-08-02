@@ -82,8 +82,8 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         const blob = new Blob([gltfBlob], { type: "model/gltf+json" });
         console.log(gltfBlob);
         model = new Gltf2Node({
-          json: gltfBlob,
-          url: null,
+          json: null,
+          url: media/gltf/poster/poster.gltf,
         });
       } else {
         console.log("no gltf model loaded");
