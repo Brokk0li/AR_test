@@ -75,7 +75,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       arObject.visible = false;
       scene.addNode(arObject);
 
-      const model = null;
+      let model = null;
       const gltfBlob = localStorage.getItem("gltfModel");
       if (gltfBlob) {
         console.log("loading stored model");
