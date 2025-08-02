@@ -70,6 +70,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let flower = new Gltf2Node({url: 'media/gltf/sunflower/sunflower.gltf'});
       arObject.addNode(flower);
 
+      let poster = new Gltf2Node({url: 'media/gltf/poster/poster.gltf'});
+      arObject.addNode(poster);
+
       let reticle = new Gltf2Node({url: 'media/gltf/reticle/reticle.gltf'});
       reticle.visible = false;
       scene.addNode(reticle);
@@ -162,9 +165,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       let anchoredObjects = [];
       function addAnchoredObjectsToScene(anchor) {
         let flower = new Gltf2Node({url: 'media/gltf/sunflower/sunflower.gltf'});
-        scene.addNode(flower);
+        let poster = new Gltf2Node({url: 'media/gltf/poster/poster.gltf'});
+        scene.addNode(poster);
         anchoredObjects.push({
-          anchoredObject: flower,
+          anchoredObject: poster,
           anchor: anchor
         });
 
