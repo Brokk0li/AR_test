@@ -83,11 +83,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         console.log(gltfBlob);
         model = new Gltf2Node({
           json: gltfBlob,
+          url: null,
         });
       } else {
         console.log("no gltf model loaded");
         model = new Gltf2Node({
           url: "media/gltf/sunflower/sunflower.gltf",
+          json: null,
         });
       }
 
