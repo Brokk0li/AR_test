@@ -52,13 +52,14 @@ export class Gltf2Node extends Node {
 
     let loadPromise;
 
-    if(this._json != null){
-      loadPromise = loader.loadFromJson(this._json, "")
+    if (this._json != null) {
+      const sceneNode = loader.loadFromJson(this._json, "");
+      loadPromise = Promise.resolve(sceneNode);
     }
-    else if (this._url != null){
+    else if (this._url != null) {
       loadPromise = loader.loadFromUrl(this._url)
     }
-    else{
+    else {
       console.log("error url and json null")
     }
 
