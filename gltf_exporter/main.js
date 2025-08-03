@@ -9,10 +9,13 @@ camera.position.z = 2;
 const status = document.getElementById("status");
 status.textContent = "waiting for image";
 
-function removeGLTF() {
-    localStorage.removeItem("gltfModel");
-    alert("gltfModel removed from localStorage.");
-}
+document.addEventListener("DOMContentLoaded", () => {
+    const button = document.getElementById("removeBtn");
+    button.addEventListener("click", () => {
+        localStorage.removeItem("gltfModel");
+        alert("gltfModel removed from localStorage.");
+    });
+});
 
 document.getElementById("upload").addEventListener("change", (event) => {
     const file = event.target.files[0];
