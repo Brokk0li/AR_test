@@ -79,11 +79,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
       const gltfBlob = localStorage.getItem("gltfModel");
       if (gltfBlob != null) {
         console.log("loading stored model");
-        const blob = new Blob([gltfBlob], { type: "model/gltf+json" });
-        console.log(gltfBlob);
+        const blob = new Blob([gltfBlob], { type: "json" });
+        console.log(JSON.parse(await blob.text()));
         model = new Gltf2Node({
-          json: null,
-          url: "media/gltf/poster/poster.gltf",
+          json: JSON.parse(await blob.text()),
+          url: null,
         });
       } else {
         console.log("no gltf model loaded");
