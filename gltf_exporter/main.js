@@ -37,7 +37,7 @@ document.getElementById("upload").addEventListener("change", (event) => {
             });
 
             const plane = new THREE.Mesh(geometry, material);
-            //plane.rotation.x = -Math.PI / 2; // lay flat
+            plane.rotation.x = Math.PI / 2; // lay flat
             //plane.rotation.z = Math.PI; // flip front face upward
             //plane.rotation.y = Math.PI; // flip front face upward
             //plane.position.y = 0;
