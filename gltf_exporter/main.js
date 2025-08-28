@@ -9,12 +9,18 @@ camera.position.z = 2;
 const status = document.getElementById("status");
 status.textContent = "waiting for image";
 
+let checkbox_download = false;
+
 document.addEventListener("DOMContentLoaded", () => {
     const button = document.getElementById("removeBtn");
     button.addEventListener("click", () => {
         localStorage.removeItem("gltfModel");
         alert("gltfModel removed from localStorage.");
     });
+});
+
+checkbox.addEventListener("change", function () {
+    checkbox_download = checkbox.checked;
 });
 
 document.getElementById("upload").addEventListener("change", (event) => {
@@ -68,18 +74,13 @@ document.getElementById("upload").addEventListener("change", (event) => {
                         mime = "application/json";
                         extension = "gltf";
                     }
-                    const reader = new FileReader();
-                    reader.onload = function (output) {
-                        localStorage.setItem("gltfModel", output.target.result);
-                    };
                     const blob = new Blob([output], { type: mime });
-                    reader.readAsText(blob); // since it's JSON
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = "image-plane." + extension;
-                    a.click();
-                    URL.revokeObjectURL(url);
+
+                    local_store_blob(blob);
+
+                    if (checkbox_download) {
+                        download_gltf(blob, extension);
+                    }
 
                     status.textContent = `✅ Exported as image-plane.${extension}`;
                 },
@@ -100,3 +101,21 @@ document.getElementById("upload").addEventListener("change", (event) => {
 
     reader.readAsDataURL(file);
 });
+
+function download_gltf(blob, extension) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "image-plane." + extension;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function local_store_blob(blob) {
+    const reader = new FileReader();
+    reader.onload = function (output) {
+        localStorage.setItem("gltfModel", output.target.result);
+    };
+
+    reader.readAsText(blob);
+}
