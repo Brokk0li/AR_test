@@ -2,14 +2,20 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, user-scalable=no"
+    />
     <title>WebXR Vertical Hit Test</title>
   </head>
   <body>
     <script type="module">
       import { WebXRButton } from "./js/util/webxr-button.js";
       import { Scene } from "./js/render/scenes/scene.js";
-      import { Renderer, createWebGLContext } from "./js/render/core/renderer.js";
+      import {
+        Renderer,
+        createWebGLContext,
+      } from "./js/render/core/renderer.js";
       import { Gltf2Node } from "./js/render/nodes/gltf2.js";
 
       // XR globals
@@ -75,9 +81,11 @@
 
         session.requestReferenceSpace("viewer").then((refSpace) => {
           xrViewerSpace = refSpace;
-          session.requestHitTestSource({ space: xrViewerSpace }).then((hitTestSource) => {
-            xrHitTestSource = hitTestSource;
-          });
+          session
+            .requestHitTestSource({ space: xrViewerSpace })
+            .then((hitTestSource) => {
+              xrHitTestSource = hitTestSource;
+            });
         });
 
         session.requestReferenceSpace("local").then((refSpace) => {
@@ -109,9 +117,11 @@
         // Extract Y-axis (up vector) from transform matrix
         let m = hitPose.transform.matrix;
         // The normal to the plane is the 3rd column of the matrix (z-axis of hit space)
-        let nx = m[8], ny = m[9], nz = m[10];
+        let nx = m[8],
+          ny = m[9],
+          nz = m[10];
         // If surface normal is mostly horizontal (ny ≈ 0), then it's vertical
-        return Math.abs(ny) < 0.5; 
+        return Math.abs(ny) < 0.5;
       }
 
       function onXRFrame(t, frame) {
@@ -132,6 +142,9 @@
             if (isVertical(hitPose)) {
               verticalHits.push(hitPose);
               console.log("Vertical surface detected!", verticalHits.length);
+              if (verticalHits.length > 200) {
+                verticalHits.length.shift();
+              }
             }
           }
         }
