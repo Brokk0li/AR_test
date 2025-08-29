@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <title>WebXR Vertical Hit Test</title>
+  </head>
+  <body>
+    <script type="module">
+      import { WebXRButton } from "./js/util/webxr-button.js";
+      import { Scene } from "./js/render/scenes/scene.js";
+      import { Renderer, createWebGLContext } from "./js/render/core/renderer.js";
+      import { Gltf2Node } from "./js/render/nodes/gltf2.js";
+
+      // XR globals
+      let xrButton = null;
+      let xrRefSpace = null;
+      let xrViewerSpace = null;
+      let xrHitTestSource = null;
+
+      // Scene setup
+      let gl = null;
+      let renderer = null;
+      let scene = new Scene();
+      scene.clear = false; // transparent background for AR
+
+      // Reticle
+      let reticle = new Gltf2Node({ url: "media/gltf/reticle/reticle.gltf" });
+      reticle.visible = false;
+      scene.addNode(reticle);
+      let reticleHitTestResult = null;
+
+      // Store vertical hits
+      let verticalHits = [];
+
+      function initXR() {
+        xrButton = new WebXRButton({
+          onRequestSession: onRequestSession,
+          onEndSession: onEndSession,
+          textEnterXRTitle: "START AR",
+          textXRNotFoundTitle: "AR NOT FOUND",
+          textExitXRTitle: "EXIT AR",
+        });
+        document.body.appendChild(xrButton.domElement);
+
+        if (navigator.xr) {
+          navigator.xr.isSessionSupported("immersive-ar").then((supported) => {
+            xrButton.enabled = supported;
+          });
+        }
+      }
+
+      function onRequestSession() {
+        return navigator.xr
+          .requestSession("immersive-ar", {
+            requiredFeatures: ["local", "hit-test", "anchors"],
+          })
+          .then((session) => {
+            xrButton.setSession(session);
+            onSessionStarted(session);
+          });
+      }
+
+      function onSessionStarted(session) {
+        session.addEventListener("end", onSessionEnded);
+        session.addEventListener("select", onSelect);
+
+        if (!gl) {
+          gl = createWebGLContext({ xrCompatible: true });
+          renderer = new Renderer(gl);
+          scene.setRenderer(renderer);
+        }
+
+        session.updateRenderState({ baseLayer: new XRWebGLLayer(session, gl) });
+
+        session.requestReferenceSpace("viewer").then((refSpace) => {
+          xrViewerSpace = refSpace;
+          session.requestHitTestSource({ space: xrViewerSpace }).then((hitTestSource) => {
+            xrHitTestSource = hitTestSource;
+          });
+        });
+
+        session.requestReferenceSpace("local").then((refSpace) => {
+          xrRefSpace = refSpace;
+          session.requestAnimationFrame(onXRFrame);
+        });
+      }
+
+      function onEndSession(session) {
+        xrHitTestSource?.cancel();
+        xrHitTestSource = null;
+        session.end();
+      }
+
+      function onSessionEnded() {
+        xrButton.setSession(null);
+      }
+
+      function onSelect() {
+        if (reticle.visible) {
+          reticleHitTestResult.createAnchor().catch((err) => {
+            console.error("Could not create anchor:", err);
+          });
+        }
+      }
+
+      // Check if hit surface is vertical
+      function isVertical(hitPose) {
+        // Extract Y-axis (up vector) from transform matrix
+        let m = hitPose.transform.matrix;
+        // The normal to the plane is the 3rd column of the matrix (z-axis of hit space)
+        let nx = m[8], ny = m[9], nz = m[10];
+        // If surface normal is mostly horizontal (ny ≈ 0), then it's vertical
+        return Math.abs(ny) < 0.5; 
+      }
+
+      function onXRFrame(t, frame) {
+        let session = frame.session;
+        let pose = frame.getViewerPose(xrRefSpace);
+
+        reticle.visible = false;
+
+        if (xrHitTestSource && pose) {
+          let hitTestResults = frame.getHitTestResults(xrHitTestSource);
+          if (hitTestResults.length > 0) {
+            let hitPose = hitTestResults[0].getPose(xrRefSpace);
+            reticle.visible = true;
+            reticle.matrix = hitPose.transform.matrix;
+            reticleHitTestResult = hitTestResults[0];
+
+            // Check if hit is vertical
+            if (isVertical(hitPose)) {
+              verticalHits.push(hitPose);
+              console.log("Vertical surface detected!", verticalHits.length);
+            }
+          }
+        }
+
+        scene.startFrame();
+        session.requestAnimationFrame(onXRFrame);
+        scene.drawXRFrame(frame, pose);
+        scene.endFrame();
+      }
+
+      initXR();
+    </script>
+  </body>
+</html>
